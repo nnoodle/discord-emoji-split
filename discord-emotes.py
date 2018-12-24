@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import os
 import argparse
+from math import ceil
 from numbers import Number
 from wand.display import display
 from wand.image import Image
@@ -26,39 +27,17 @@ name, ext = os.path.splitext(os.path.basename(args.input))
 args.output = os.path.abspath(args.output)
 
 with Image(filename=args.input) as img:
-    s = args.width * args.height >= 28
-    a = round(img.width/args.width*1/33)
-    b = -a
-    c = None if s else round(img.height/args.height*1.5/33.5)
-    d = None if s else -c
     f = img.width/args.width
     g = img.height/args.height
+    a = f * (2/66 + 3/83 + 4/100 + 4/116)/4
+    b = 0 if args.width * args.height >= 28 else g * \
+        (3/67 + 4/84 + 5/101 + 5/117)/4
     p = 0
     for j in range(1, args.height + 1):
-        with img[:, round((j - 1) * g):round(j * g)] as hcrop:
-            for i in range(1, args.width + 1):
-                with hcrop[round((i - 1) * f):round(i * f), :] as wcrop:
-                    with wcrop[a:b, c:d] as crop:
-                        p += 1
-                        crop.save(filename=''.join(
-                            [args.output, '/', name, str(p), ext]))
-                        print(':{0}{1}:'.format(name, p), end='')
-            print('')
-
-# with Image(filename=args.input) as img:
-#     s = args.width * args.height >= 28
-#     a = round(img.width/args.width*1/33)
-#     b = -a
-#     c = None if s else round(img.height/args.height*1.5/33.5)
-#     d = None if s else -c
-#     f = img.width/args.width
-#     g = img.height/args.height
-#     p = 0
-#     for j in range(1, args.height + 1):
-#         for i in range(1, args.width + 1):
-#             with img[round((i - 1) * f)+a:round(i * f)+b, round((j - 1) * g)+c:round(j * g)+d] as crop:
-#                 p += 1
-#                 crop.save(filename=''.join(
-#                     [args.output, '/', name, str(p), ext]))
-#                 print(':{0}{1}:'.format(name, p), end='')
-#         print('')
+        for i in range(1, args.width + 1):
+            with img[ceil((i - 1) * f + a):ceil(i * f - a), ceil((j - 1) * g + b):ceil(j * g - b)] as crop:
+                p += 1
+                crop.save(filename=''.join(
+                    [args.output, '/', name, str(p), ext]))
+                print(':{0}{1}:'.format(name, p), end='')
+        print('')
