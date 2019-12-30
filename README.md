@@ -14,7 +14,7 @@ $ pip install Wand
 
 ## Usage
 Running `discord-emoji-split.py` with only an image argument will
-split that image into a 2x2 to a directory named `emotes`, then
+split that image into a 2×2 to a directory named `emojis`, then
 output the emoji codes.
 
 ```shell
