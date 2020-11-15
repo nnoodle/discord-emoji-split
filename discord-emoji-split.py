@@ -15,32 +15,33 @@ parser.add_argument(
 parser.add_argument(
     '-y', '--height', help='Height of the output.', type=int, default=2)
 parser.add_argument(
-    '-e', '--ext', help='Filename extension')
+    '-e', '--ext', help='Filename extension.')
 parser.add_argument(
-    '-o', '--output', help='The output directory.', default='emojis')
+    '-o', '--output', help='The output directory.')
 args = parser.parse_args()
+
+name, ext = os.path.splitext(os.path.basename(args.input))
+name = sub('[^A-Za-z0-9_]', '', name)
+ext = '.'+args.ext if args.ext else ext
+args.output = args.output or name
 
 if not os.path.exists(args.output):
     os.mkdir(args.output)
 elif not os.path.isdir(args.output):
     raise OSError('Not a directory', args.output)
 
-name, ext = os.path.splitext(os.path.basename(args.input))
-name = sub('[^A-Za-z0-9_]', '', name)
-ext = '.'+args.ext if args.ext else ext
 args.output = os.path.abspath(args.output)
 
-
 def resize(img):
-    if Fraction(img.width, img.height) == Fraction(args.width, args.height):
-        return img.width, img.height
-
     x = img.width - (img.width % args.width)
     y = x * Fraction(args.height, args.width)
     if y.denominator != 1:
         x = x.denominator*x
         y = y.denominator*y
     y = round(y)
+
+    if x != img.width or y != img.height:
+        print("width  = {} → {}\nheight = {} → {}\n".format(img.width, x, img.height, y))
 
     img.sample(x, y)
     return x, y
